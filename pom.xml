@@ -17,16 +17,40 @@
         <java.version>17</java.version>
     </properties>
     <dependencies>
+        <!--   SPRING    -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-jdbc</artifactId>
+        </dependency>
 
+        <!--   OTHER    -->
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>42.6.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jooq</groupId>
+            <artifactId>jooq</artifactId>
+            <version>3.18.5</version>
+        </dependency>
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+            <version>9.21.0</version>
+        </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <optional>true</optional>
+            <version>1.18.28</version>
+            <scope>provided</scope>
         </dependency>
+
+        <!--   TESTS    -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
@@ -36,6 +60,36 @@
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.jooq</groupId>
+                <artifactId>jooq-codegen-maven</artifactId>
+                <version>3.18.5</version>
+                <executions>
+                    <execution>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <jdbc>
+                                <driver>org.postgresql.Driver</driver>
+                                <url>jdbc:postgresql://localhost:5432/postgres</url>
+                                <user>postgres</user>
+                                <password>postgres</password>
+                            </jdbc>
+                            <generator>
+                                <database>
+                                    <inputSchema>public</inputSchema>
+                                </database>
+                                <target>
+                                    <packageName>hr.tvz.financije.jooq.models</packageName>
+                                    <directory>target/generated-sources/jooq</directory>
+                                </target>
+                            </generator>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
