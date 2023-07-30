@@ -61,6 +61,16 @@
     <build>
         <plugins>
             <plugin>
+                <groupId>org.flywaydb</groupId>
+                <artifactId>flyway-maven-plugin</artifactId>
+                <version>9.21.1</version>
+                <configuration>
+                    <url>jdbc:postgresql://localhost:5432/postgres</url>
+                    <user>postgres</user>
+                    <password>postgres</password>
+                </configuration>
+            </plugin>
+            <plugin>
                 <groupId>org.jooq</groupId>
                 <artifactId>jooq-codegen-maven</artifactId>
                 <version>3.18.5</version>
@@ -80,10 +90,13 @@
                             <generator>
                                 <database>
                                     <inputSchema>public</inputSchema>
+                                    <excludes>
+                                        public\.flyway_schema_history
+                                    </excludes>
                                 </database>
                                 <target>
-                                    <packageName>hr.tvz.financije.jooq.models</packageName>
-                                    <directory>target/generated-sources/jooq</directory>
+                                    <packageName>hr.tvz.financije.repositories.models.jooq</packageName>
+                                    <directory>src/main/java</directory>
                                 </target>
                             </generator>
                         </configuration>
