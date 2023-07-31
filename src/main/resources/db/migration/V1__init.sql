@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS currency (
     code CHAR(3) NOT NULL,
     symbol VARCHAR(50) NOT NULL,
     exchange_rate INT NOT NULL,
-    last_update_date DATE NOT NULL
+    last_update_date TIMESTAMP NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS category (
@@ -21,6 +21,8 @@ CREATE TABLE IF NOT EXISTS category (
     color CHAR(7) NOT NULL,
     profile_id INT REFERENCES profile
 );
+
+CREATE INDEX IF NOT EXISTS category_profile_id_idx ON category(profile_id);
 
 CREATE TABLE IF NOT EXISTS account (
     id SERIAL PRIMARY KEY,
@@ -33,14 +35,17 @@ CREATE TABLE IF NOT EXISTS account (
     currency_id INT NOT NULL REFERENCES currency
 );
 
+CREATE INDEX IF NOT EXISTS account_currency_id_idx ON account(currency_id);
+
 CREATE TABLE IF NOT EXISTS record (
     id SERIAL PRIMARY KEY,
     amount INT NOT NULL,
     type VARCHAR(10) NOT NULL,
-    record_date DATE NOT NULL,
+    record_date TIMESTAMP NOT NULL,
     description VARCHAR(255),
+    category_id INT NOT NULL REFERENCES category,
     account_id INT NOT NULL REFERENCES account,
     receiving_account_id INT REFERENCES account
 );
 
-CREATE INDEX IF NOT EXISTS record_type_record_date_idx ON record(type, record_date);
+CREATE INDEX IF NOT EXISTS record_account_id_idx ON record(account_id);
