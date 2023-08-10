@@ -2,7 +2,7 @@ package hr.tvz.financije.services;
 
 import hr.tvz.financije.repositories.CurrencyRepository;
 import hr.tvz.financije.repositories.entities.jooq.tables.records.CurrencyRecord;
-import hr.tvz.financije.services.models.Currency;
+import hr.tvz.financije.services.models.CurrencyDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -14,12 +14,12 @@ public class CurrencyService {
 
     private final CurrencyRepository repository;
 
-    public List<Currency> getCurrencies() {
-        return repository.getCurrencies().stream().map(this::mapToCurrency).toList();
+    public List<CurrencyDto> getCurrencies() {
+        return repository.getCurrencies().stream().map(this::mapToCurrencyDto).toList();
     }
 
-    private Currency mapToCurrency(CurrencyRecord record) {
-        return new Currency(record.getId(),
+    private CurrencyDto mapToCurrencyDto(CurrencyRecord record) {
+        return new CurrencyDto(record.getId(),
                 record.getName(),
                 record.getCode(),
                 record.getSymbol(),

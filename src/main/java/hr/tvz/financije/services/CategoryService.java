@@ -1,9 +1,9 @@
 package hr.tvz.financije.services;
 
-import hr.tvz.financije.controllers.models.CategoryCommand;
+import hr.tvz.financije.controllers.models.commands.CategoryCommand;
 import hr.tvz.financije.repositories.CategoryRepository;
 import hr.tvz.financije.repositories.entities.jooq.tables.records.CategoryRecord;
-import hr.tvz.financije.services.models.Category;
+import hr.tvz.financije.services.models.CategoryDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -15,22 +15,22 @@ public class CategoryService {
 
     private final CategoryRepository repository;
 
-    public List<Category> getCategories() {
+    public List<CategoryDto> getCategories() {
         // todo real profileId
-        return repository.getCategories(1).stream().map(this::mapToCategory).toList();
+        return repository.getCategories(1).stream().map(this::mapToCategoryDto).toList();
     }
 
-    public Category saveCategory(CategoryCommand command) {
+    public CategoryDto saveCategory(CategoryCommand command) {
         // todo real profileId
-        return mapToCategory(repository.saveCategory(mapToCategoryRecord(command, 1)));
+        return mapToCategoryDto(repository.saveCategory(mapToCategoryRecord(command, 1)));
     }
 
     public void deleteCategoryById(int id) {
         repository.deleteCategoryById(id);
     }
 
-    private Category mapToCategory(CategoryRecord record) {
-        return new Category(record.getId(),
+    private CategoryDto mapToCategoryDto(CategoryRecord record) {
+        return new CategoryDto(record.getId(),
                 record.getName(),
                 record.getIcon(),
                 record.getColor(),

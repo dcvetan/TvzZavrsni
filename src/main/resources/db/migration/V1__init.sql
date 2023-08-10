@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS profile (
     id SERIAL PRIMARY KEY,
-    username VARCHAR(50) NOT NULL,
+    username VARCHAR(50) UNIQUE NOT NULL,
     hashed_password VARCHAR(255) NOT NULL,
     salt CHAR(36) NOT NULL
 );

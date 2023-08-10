@@ -1,8 +1,8 @@
 package hr.tvz.financije.controllers;
 
-import hr.tvz.financije.controllers.models.AccountCommand;
+import hr.tvz.financije.controllers.models.commands.AccountCommand;
 import hr.tvz.financije.services.AccountService;
-import hr.tvz.financije.services.models.Account;
+import hr.tvz.financije.services.models.AccountDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -13,17 +13,18 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/account")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "http://localhost:9000")
 public class AccountController {
 
     private final AccountService service;
 
     @GetMapping
-    public ResponseEntity<List<Account>> getAccounts() {
+    public ResponseEntity<List<AccountDto>> getAccounts() {
         return ResponseEntity.ok(service.getAccounts());
     }
 
     @PostMapping
-    public ResponseEntity<Account> saveAccount(@RequestBody @Valid AccountCommand command) {
+    public ResponseEntity<AccountDto> saveAccount(@RequestBody @Valid AccountCommand command) {
         return ResponseEntity.ok(service.saveAccount(command));
     }
 

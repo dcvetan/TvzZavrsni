@@ -1,6 +1,6 @@
 package hr.tvz.financije.services.models;
 
-public record Account(
+public record AccountDto(
         int id,
         String name,
         int amount,

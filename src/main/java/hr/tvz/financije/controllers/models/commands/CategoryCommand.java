@@ -1,4 +1,4 @@
-package hr.tvz.financije.controllers.models;
+package hr.tvz.financije.controllers.models.commands;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;

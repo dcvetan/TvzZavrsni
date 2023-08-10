@@ -2,7 +2,7 @@ package hr.tvz.financije.services.models;
 
 import java.time.LocalDateTime;
 
-public record Record(
+public record RecordDto(
         int id,
         int amount,
         String type,

@@ -1,8 +1,8 @@
 package hr.tvz.financije.controllers;
 
-import hr.tvz.financije.controllers.models.CategoryCommand;
+import hr.tvz.financije.controllers.models.commands.CategoryCommand;
 import hr.tvz.financije.services.CategoryService;
-import hr.tvz.financije.services.models.Category;
+import hr.tvz.financije.services.models.CategoryDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -13,17 +13,18 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/category")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "http://localhost:9000")
 public class CategoryController {
 
     private final CategoryService service;
 
     @GetMapping
-    public ResponseEntity<List<Category>> getCategories() {
+    public ResponseEntity<List<CategoryDto>> getCategories() {
         return ResponseEntity.ok(service.getCategories());
     }
 
     @PostMapping
-    public ResponseEntity<Category> saveCategory(@RequestBody @Valid CategoryCommand command) {
+    public ResponseEntity<CategoryDto> saveCategory(@RequestBody @Valid CategoryCommand command) {
         return ResponseEntity.ok(service.saveCategory(command));
     }
 

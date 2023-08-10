@@ -8,6 +8,7 @@ import org.jooq.DSLContext;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import static hr.tvz.financije.repositories.entities.jooq.Tables.ACCOUNT;
 import static hr.tvz.financije.repositories.entities.jooq.Tables.CURRENCY;
@@ -32,8 +33,8 @@ public class AccountRepository {
                 .fetchInto(AccountEntity.class);
     }
 
-    public AccountEntity getAccountById(int id) {
-        return dslContext.select(ACCOUNT.ID,
+    public Optional<AccountEntity> findAccountById(int id) {
+        return Optional.ofNullable(dslContext.select(ACCOUNT.ID,
                         ACCOUNT.NAME,
                         ACCOUNT.AMOUNT,
                         ACCOUNT.TYPE,
@@ -43,7 +44,7 @@ public class AccountRepository {
                 .from(ACCOUNT)
                 .join(CURRENCY).onKey(Keys.ACCOUNT__ACCOUNT_CURRENCY_ID_FKEY)
                 .where(ACCOUNT.ID.eq(id))
-                .fetchOneInto(AccountEntity.class);
+                .fetchOneInto(AccountEntity.class));
     }
 
     public AccountRecord saveAccount(AccountRecord record) {

@@ -25,21 +25,21 @@
           Personal finance
         </q-item-label>
 
-<!--        <q-item-->
-<!--          clickable-->
-<!--          :to="{name:''}"-->
-<!--        >-->
-<!--          <q-item-section-->
-<!--            avatar-->
-<!--          >-->
-<!--            <q-icon name="" />-->
-<!--          </q-item-section>-->
+        <q-item
+          clickable
+          :to="{name:'login'}"
+        >
+          <q-item-section
+            avatar
+          >
+            <q-icon name="" />
+          </q-item-section>
 
-<!--          <q-item-section>-->
-<!--            <q-item-label></q-item-label>-->
-<!--            <q-item-label caption></q-item-label>-->
-<!--          </q-item-section>-->
-<!--        </q-item>-->
+          <q-item-section>
+            <q-item-label>sss</q-item-label>
+            <q-item-label caption></q-item-label>
+          </q-item-section>
+        </q-item>
       </q-list>
     </q-drawer>
 

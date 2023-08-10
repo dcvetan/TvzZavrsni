@@ -1,10 +1,10 @@
 package hr.tvz.financije.services;
 
-import hr.tvz.financije.controllers.models.RecordCommand;
+import hr.tvz.financije.controllers.models.commands.RecordCommand;
 import hr.tvz.financije.repositories.RecordRepository;
 import hr.tvz.financije.repositories.entities.jooq.tables.records.RecordRecord;
-import hr.tvz.financije.services.models.Account;
-import hr.tvz.financije.services.models.Record;
+import hr.tvz.financije.services.models.AccountDto;
+import hr.tvz.financije.services.models.RecordDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,23 +17,23 @@ public class RecordService {
     private final RecordRepository repository;
     private final AccountService accountService;
 
-    public List<Record> getRecords() {
-        List<Account> profileAccounts = accountService.getAccounts();
-        return repository.getRecords(profileAccounts.stream().map(Account::id).toList())
+    public List<RecordDto> getRecords() {
+        List<AccountDto> profileAccountDtos = accountService.getAccounts();
+        return repository.getRecords(profileAccountDtos.stream().map(AccountDto::id).toList())
                 .stream()
-                .map(this::mapToRecord).toList();
+                .map(this::mapToRecordDto).toList();
     }
 
-    public Record saveRecord(RecordCommand command) {
-        return mapToRecord(repository.saveRecord(mapToRecordRecord(command)));
+    public RecordDto saveRecord(RecordCommand command) {
+        return mapToRecordDto(repository.saveRecord(mapToRecordRecord(command)));
     }
 
     public void deleteRecordById(int id) {
         repository.deleteRecordById(id);
     }
 
-    private Record mapToRecord(RecordRecord record) {
-        return new Record(record.getId(),
+    private RecordDto mapToRecordDto(RecordRecord record) {
+        return new RecordDto(record.getId(),
                 record.getAmount(),
                 record.getType(),
                 record.getRecordDate(),

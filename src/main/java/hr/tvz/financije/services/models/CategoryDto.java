@@ -1,6 +1,6 @@
 package hr.tvz.financije.services.models;
 
-public record Category(
+public record CategoryDto(
         int id,
         String name,
         String icon,
