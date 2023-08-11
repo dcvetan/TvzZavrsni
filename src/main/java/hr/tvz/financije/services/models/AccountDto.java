@@ -7,6 +7,6 @@ public record AccountDto(
         String type,
         String color,
         String source,
-        String currencySymbol
+        int currencyId
 ) {
 }

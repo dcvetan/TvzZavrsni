@@ -1,5 +1,5 @@
 export interface AccountRequest {
-  id: number,
+  id: number | undefined,
   name: string,
   amount: number,
   type: string,

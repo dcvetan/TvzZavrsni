@@ -18,7 +18,7 @@ export const useAuthStore = defineStore(
 
         localStorage.setItem('user', JSON.stringify(user));
 
-        await this.router.push(this.returnUrl || '/')
+        this.router.push(this.returnUrl || '/')
       },
       async signUp(username: string, password: string) {
         const user = await axios.post(`${baseUrl}/signup`, { username, password })
@@ -27,12 +27,12 @@ export const useAuthStore = defineStore(
 
         localStorage.setItem('user', JSON.stringify(user));
 
-        await this.router.push(this.returnUrl || '/')
+        this.router.push(this.returnUrl || '/')
       },
-      async logout() {
+      logout() {
         this.user = null;
         localStorage.removeItem('user');
-        await this.router.push('/login')
+        this.router.push('/login')
       }
     },
 });

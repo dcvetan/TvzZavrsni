@@ -5,5 +5,5 @@ export interface Account {
   type: string,
   color: string,
   source: string,
-  currencySymbol: string
+  currencyId: number
 }

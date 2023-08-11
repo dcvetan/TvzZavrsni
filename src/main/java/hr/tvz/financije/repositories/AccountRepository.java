@@ -1,7 +1,5 @@
 package hr.tvz.financije.repositories;
 
-import hr.tvz.financije.repositories.entities.AccountEntity;
-import hr.tvz.financije.repositories.entities.jooq.Keys;
 import hr.tvz.financije.repositories.entities.jooq.tables.records.AccountRecord;
 import lombok.RequiredArgsConstructor;
 import org.jooq.DSLContext;
@@ -11,7 +9,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static hr.tvz.financije.repositories.entities.jooq.Tables.ACCOUNT;
-import static hr.tvz.financije.repositories.entities.jooq.Tables.CURRENCY;
 
 @Repository
 @RequiredArgsConstructor
@@ -19,32 +16,16 @@ public class AccountRepository {
 
     private final DSLContext dslContext;
 
-    public List<AccountEntity> getAccounts(int profileId) {
-        return dslContext.select(ACCOUNT.ID,
-                        ACCOUNT.NAME,
-                        ACCOUNT.AMOUNT,
-                        ACCOUNT.TYPE,
-                        ACCOUNT.COLOR,
-                        ACCOUNT.SOURCE,
-                        CURRENCY.SYMBOL)
-                .from(ACCOUNT)
-                .join(CURRENCY).onKey(Keys.ACCOUNT__ACCOUNT_CURRENCY_ID_FKEY)
+    public List<AccountRecord> getAccounts(int profileId) {
+        return dslContext.selectFrom(ACCOUNT)
                 .where(ACCOUNT.PROFILE_ID.eq(profileId))
-                .fetchInto(AccountEntity.class);
+                .fetch();
     }
 
-    public Optional<AccountEntity> findAccountById(int id) {
-        return Optional.ofNullable(dslContext.select(ACCOUNT.ID,
-                        ACCOUNT.NAME,
-                        ACCOUNT.AMOUNT,
-                        ACCOUNT.TYPE,
-                        ACCOUNT.COLOR,
-                        ACCOUNT.SOURCE,
-                        CURRENCY.SYMBOL)
-                .from(ACCOUNT)
-                .join(CURRENCY).onKey(Keys.ACCOUNT__ACCOUNT_CURRENCY_ID_FKEY)
+    public Optional<AccountRecord> findAccountById(int id) {
+        return Optional.ofNullable(dslContext.selectFrom(ACCOUNT)
                 .where(ACCOUNT.ID.eq(id))
-                .fetchOneInto(AccountEntity.class));
+                .fetchOne());
     }
 
     public AccountRecord saveAccount(AccountRecord record) {

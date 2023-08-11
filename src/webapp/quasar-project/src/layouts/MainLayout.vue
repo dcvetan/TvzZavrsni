@@ -10,6 +10,9 @@
           aria-label="Menu"
           @click="toggleLeftDrawer"
         />
+        <q-toolbar-title>
+          Personal finance application
+        </q-toolbar-title>
       </q-toolbar>
     </q-header>
 
@@ -22,7 +25,7 @@
         <q-item-label
           header
         >
-          Personal finance
+          Menu
         </q-item-label>
 
         <q-item
@@ -32,12 +35,27 @@
           <q-item-section
             avatar
           >
-            <q-icon name="" />
+            <q-icon name="dashboard" />
           </q-item-section>
 
           <q-item-section>
-            <q-item-label>sss</q-item-label>
-            <q-item-label caption></q-item-label>
+            <q-item-label>Dashboard</q-item-label>
+          </q-item-section>
+        </q-item>
+
+        <q-item
+          clickable
+          :to="{name:'login'}"
+          @click="onLogout"
+        >
+          <q-item-section
+            avatar
+          >
+            <q-icon name="logout" />
+          </q-item-section>
+
+          <q-item-section>
+            <q-item-label>Logout</q-item-label>
           </q-item-section>
         </q-item>
       </q-list>
@@ -51,10 +69,16 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
+import { useAuthStore } from 'stores/authStore';
 
+const authStore = useAuthStore()
 const leftDrawerOpen = ref(false)
 
 function toggleLeftDrawer () {
   leftDrawerOpen.value = !leftDrawerOpen.value
+}
+
+function onLogout() {
+  authStore.logout()
 }
 </script>

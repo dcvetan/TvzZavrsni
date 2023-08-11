@@ -2,7 +2,6 @@ package hr.tvz.financije.services;
 
 import hr.tvz.financije.controllers.models.commands.AccountCommand;
 import hr.tvz.financije.repositories.AccountRepository;
-import hr.tvz.financije.repositories.entities.AccountEntity;
 import hr.tvz.financije.repositories.entities.jooq.tables.records.AccountRecord;
 import hr.tvz.financije.security.services.UserDetailsServiceImpl;
 import hr.tvz.financije.services.models.AccountDto;
@@ -37,17 +36,17 @@ public class AccountService {
         repository.deleteAccountById(id);
     }
 
-    private AccountDto mapToAccountDto(AccountEntity entity) {
-        return new AccountDto(entity.id(),
-                entity.name(),
-                BigDecimal.valueOf(entity.amount())
+    private AccountDto mapToAccountDto(AccountRecord record) {
+        return new AccountDto(record.getId(),
+                record.getName(),
+                BigDecimal.valueOf(record.getAmount())
                         .divide(BigDecimal.valueOf(100), RoundingMode.HALF_UP)
                         .setScale(2, RoundingMode.HALF_UP)
                         .doubleValue(),
-                entity.type(),
-                entity.color(),
-                entity.source(),
-                entity.currencySymbol());
+                record.getType(),
+                record.getColor(),
+                record.getSource(),
+                record.getCurrencyId());
     }
 
     private AccountRecord mapToAccountRecord(AccountCommand command, int profileId) {

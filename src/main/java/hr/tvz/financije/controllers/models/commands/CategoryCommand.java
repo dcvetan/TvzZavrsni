@@ -9,6 +9,6 @@ public record CategoryCommand(
 
         @NotBlank @Size(max = 50) String name,
         @NotBlank @Size(max = 50) String icon,
-        @NotBlank @Size(max = 7) String color
+        @NotBlank @Size(max = 20) String color
 ) {
 }
