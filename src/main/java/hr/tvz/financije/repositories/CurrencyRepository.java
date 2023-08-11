@@ -1,6 +1,7 @@
 package hr.tvz.financije.repositories;
 
 import hr.tvz.financije.repositories.entities.jooq.tables.records.CurrencyRecord;
+import hr.tvz.financije.services.models.CurrencyUpdateEntity;
 import lombok.RequiredArgsConstructor;
 import org.jooq.DSLContext;
 import org.springframework.stereotype.Repository;
@@ -19,12 +20,15 @@ public class CurrencyRepository {
         return dslContext.selectFrom(CURRENCY).fetch();
     }
 
-    public CurrencyRecord saveCurrency(CurrencyRecord record) {
-        return dslContext.insertInto(CURRENCY)
-                .set(record)
-                .onDuplicateKeyUpdate()
-                .set(record)
-                .returning()
-                .fetchOne();
+    public void saveCurrencies(List<CurrencyUpdateEntity> entities) {
+        dslContext.batched(configuration -> {
+            for (CurrencyUpdateEntity entity : entities) {
+                configuration.dsl().update(CURRENCY)
+                        .set(CURRENCY.EXCHANGE_RATE, entity.exchangeRate())
+                        .set(CURRENCY.LAST_UPDATE_DATE, entity.lastUpdateDate())
+                        .where(CURRENCY.CODE.eq(entity.code()))
+                        .execute();
+            }
+        });
     }
 }

@@ -3,6 +3,7 @@ package hr.tvz.financije.services;
 import hr.tvz.financije.repositories.CurrencyRepository;
 import hr.tvz.financije.repositories.entities.jooq.tables.records.CurrencyRecord;
 import hr.tvz.financije.services.models.CurrencyDto;
+import hr.tvz.financije.services.models.CurrencyUpdateEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +17,10 @@ public class CurrencyService {
 
     public List<CurrencyDto> getCurrencies() {
         return repository.getCurrencies().stream().map(this::mapToCurrencyDto).toList();
+    }
+
+    public void saveCurrencies(List<CurrencyUpdateEntity> currencyUpdateEntities) {
+        repository.saveCurrencies(currencyUpdateEntities);
     }
 
     private CurrencyDto mapToCurrencyDto(CurrencyRecord record) {

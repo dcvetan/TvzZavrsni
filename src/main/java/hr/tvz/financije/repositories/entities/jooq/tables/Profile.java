@@ -8,6 +8,8 @@ import hr.tvz.financije.repositories.entities.jooq.Keys;
 import hr.tvz.financije.repositories.entities.jooq.Public;
 import hr.tvz.financije.repositories.entities.jooq.tables.records.ProfileRecord;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.function.Function;
 
 import org.jooq.Field;
@@ -116,6 +118,11 @@ public class Profile extends TableImpl<ProfileRecord> {
     @Override
     public UniqueKey<ProfileRecord> getPrimaryKey() {
         return Keys.PROFILE_PKEY;
+    }
+
+    @Override
+    public List<UniqueKey<ProfileRecord>> getUniqueKeys() {
+        return Arrays.asList(Keys.PROFILE_USERNAME_KEY);
     }
 
     @Override

@@ -67,7 +67,7 @@ public class Account extends TableImpl<AccountRecord> {
     /**
      * The column <code>public.account.amount</code>.
      */
-    public final TableField<AccountRecord, Integer> AMOUNT = createField(DSL.name("amount"), SQLDataType.INTEGER.nullable(false), this, "");
+    public final TableField<AccountRecord, Long> AMOUNT = createField(DSL.name("amount"), SQLDataType.BIGINT.nullable(false), this, "");
 
     /**
      * The column <code>public.account.type</code>.
@@ -219,14 +219,14 @@ public class Account extends TableImpl<AccountRecord> {
     // -------------------------------------------------------------------------
 
     @Override
-    public Row8<Integer, String, Integer, String, String, String, Integer, Integer> fieldsRow() {
+    public Row8<Integer, String, Long, String, String, String, Integer, Integer> fieldsRow() {
         return (Row8) super.fieldsRow();
     }
 
     /**
      * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
      */
-    public <U> SelectField<U> mapping(Function8<? super Integer, ? super String, ? super Integer, ? super String, ? super String, ? super String, ? super Integer, ? super Integer, ? extends U> from) {
+    public <U> SelectField<U> mapping(Function8<? super Integer, ? super String, ? super Long, ? super String, ? super String, ? super String, ? super Integer, ? super Integer, ? extends U> from) {
         return convertFrom(Records.mapping(from));
     }
 
@@ -234,7 +234,7 @@ public class Account extends TableImpl<AccountRecord> {
      * Convenience mapping calling {@link SelectField#convertFrom(Class,
      * Function)}.
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function8<? super Integer, ? super String, ? super Integer, ? super String, ? super String, ? super String, ? super Integer, ? super Integer, ? extends U> from) {
+    public <U> SelectField<U> mapping(Class<U> toType, Function8<? super Integer, ? super String, ? super Long, ? super String, ? super String, ? super String, ? super Integer, ? super Integer, ? extends U> from) {
         return convertFrom(toType, Records.mapping(from));
     }
 }

@@ -3,7 +3,7 @@ package hr.tvz.financije.services.models;
 public record AccountDto(
         int id,
         String name,
-        int amount,
+        long amount,
         String type,
         String color,
         String source,

@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 
 public record RecordCommand(
         @Positive Integer id,
-        @NotNull @Positive Integer amount,
+        @NotNull @Positive Long amount,
         @NotBlank @Size(max = 10) String type,
         @NotNull LocalDateTime recordDate,
         @Size(max = 255) String description,

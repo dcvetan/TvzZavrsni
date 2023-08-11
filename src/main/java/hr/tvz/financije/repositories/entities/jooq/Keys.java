@@ -37,6 +37,7 @@ public class Keys {
     public static final UniqueKey<CategoryRecord> CATEGORY_PKEY = Internal.createUniqueKey(Category.CATEGORY, DSL.name("category_pkey"), new TableField[] { Category.CATEGORY.ID }, true);
     public static final UniqueKey<CurrencyRecord> CURRENCY_PKEY = Internal.createUniqueKey(Currency.CURRENCY, DSL.name("currency_pkey"), new TableField[] { Currency.CURRENCY.ID }, true);
     public static final UniqueKey<ProfileRecord> PROFILE_PKEY = Internal.createUniqueKey(Profile.PROFILE, DSL.name("profile_pkey"), new TableField[] { Profile.PROFILE.ID }, true);
+    public static final UniqueKey<ProfileRecord> PROFILE_USERNAME_KEY = Internal.createUniqueKey(Profile.PROFILE, DSL.name("profile_username_key"), new TableField[] { Profile.PROFILE.USERNAME }, true);
     public static final UniqueKey<RecordRecord> RECORD_PKEY = Internal.createUniqueKey(Record.RECORD, DSL.name("record_pkey"), new TableField[] { Record.RECORD.ID }, true);
 
     // -------------------------------------------------------------------------
