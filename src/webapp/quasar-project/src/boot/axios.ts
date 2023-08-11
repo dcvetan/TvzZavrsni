@@ -18,9 +18,9 @@ function initAxios (app: App, router: Router): AxiosInstance {
   axiosInstance.interceptors.request.use(
     <T>(request: InternalAxiosRequestConfig<T>) => {
       const { user } = useAuthStore();
-      const isLoggedIn = !!user?.token;
+      const isLoggedIn = !!user?.data.token;
       if (isLoggedIn) {
-        request.headers.setAuthorization(`Bearer ${user.token}`)
+        request.headers.setAuthorization(`Bearer ${user.data.token}`)
       }
       return request
     }

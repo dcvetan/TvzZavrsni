@@ -3,6 +3,7 @@ package hr.tvz.financije.services;
 import hr.tvz.financije.controllers.models.commands.CategoryCommand;
 import hr.tvz.financije.repositories.CategoryRepository;
 import hr.tvz.financije.repositories.entities.jooq.tables.records.CategoryRecord;
+import hr.tvz.financije.security.services.UserDetailsServiceImpl;
 import hr.tvz.financije.services.models.CategoryDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -14,15 +15,16 @@ import java.util.List;
 public class CategoryService {
 
     private final CategoryRepository repository;
+    private final UserDetailsServiceImpl userDetailsService;
 
     public List<CategoryDto> getCategories() {
-        // todo real profileId
-        return repository.getCategories(1).stream().map(this::mapToCategoryDto).toList();
+        int currentProfileId = userDetailsService.getCurrentUserProfileId();
+        return repository.getCategories(currentProfileId).stream().map(this::mapToCategoryDto).toList();
     }
 
     public CategoryDto saveCategory(CategoryCommand command) {
-        // todo real profileId
-        return mapToCategoryDto(repository.saveCategory(mapToCategoryRecord(command, 1)));
+        int currentProfileId = userDetailsService.getCurrentUserProfileId();
+        return mapToCategoryDto(repository.saveCategory(mapToCategoryRecord(command, currentProfileId)));
     }
 
     public void deleteCategoryById(int id) {

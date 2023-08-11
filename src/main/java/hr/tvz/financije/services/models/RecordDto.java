@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 
 public record RecordDto(
         int id,
-        long amount,
+        double amount,
         String type,
         LocalDateTime recordDate,
         String description,

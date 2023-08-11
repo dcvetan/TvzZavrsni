@@ -8,7 +8,7 @@ import jakarta.validation.constraints.Size;
 public record AccountCommand(
         @Positive Integer id,
         @NotBlank @Size(max = 50) String name,
-        @NotNull @Positive Long amount,
+        @NotNull @Positive Double amount,
         @NotBlank @Size(max = 10) String type,
         @NotBlank @Size(max = 7) String color,
         @NotBlank @Size(max = 10) String source,

@@ -3,7 +3,7 @@ package hr.tvz.financije.repositories.entities;
 public record AccountEntity(
         int id,
         String name,
-        int amount,
+        long amount,
         String type,
         String color,
         String source,

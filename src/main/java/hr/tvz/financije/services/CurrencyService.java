@@ -7,6 +7,8 @@ import hr.tvz.financije.services.models.CurrencyUpdateEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 
 @Service
@@ -28,7 +30,10 @@ public class CurrencyService {
                 record.getName(),
                 record.getCode(),
                 record.getSymbol(),
-                record.getExchangeRate(),
+                BigDecimal.valueOf(record.getExchangeRate())
+                        .divide(BigDecimal.valueOf(1000000), RoundingMode.HALF_UP)
+                        .setScale(2, RoundingMode.HALF_UP)
+                        .doubleValue(),
                 record.getLastUpdateDate());
     }
 }

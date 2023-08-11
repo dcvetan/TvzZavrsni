@@ -7,7 +7,7 @@ public record CurrencyDto(
         String name,
         String code,
         String symbol,
-        long exchangeRate,
+        double exchangeRate,
         LocalDateTime lastUpdateDate
 ) {
 }

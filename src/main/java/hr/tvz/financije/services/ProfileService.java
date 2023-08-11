@@ -13,7 +13,7 @@ import java.util.Optional;
 public class ProfileService {
     private final ProfileRepository repository;
 
-    public Optional<ProfileDto> findByUsername(String username) {
+    public Optional<ProfileDto> findProfileByUsername(String username) {
         return repository.findProfileByUsername(username).map(this::mapToProfileDto);
     }
 
