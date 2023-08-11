@@ -3,6 +3,22 @@
     <div class="q-pa-lg">
       <q-list bordered padding class="q-pa-md" style="min-width: 300px">
 
+        <q-item-label header>List of accounts</q-item-label>
+
+        <q-item clickable v-for="account in accountStore.accounts" :key="account.id" class="q-pa-none">
+          <q-item-section :class="'bg-' + account.color + ' q-pa-md rounded-borders'">
+            <q-item-label>{{account.name}}</q-item-label>
+            <q-item-label caption>{{account.currencySymbol}} {{account.amount}}</q-item-label>
+          </q-item-section>
+        </q-item>
+
+
+
+      </q-list>
+    </div>
+    <div class="q-pa-lg">
+      <q-list bordered padding class="q-pa-md" style="min-width: 300px">
+
         <q-item-label header>Last records overview</q-item-label>
 
         <q-item clickable v-for="record in recordOverviews" :key="record.id">
@@ -11,7 +27,7 @@
           </q-item-section>
 
           <q-item-section>
-            <q-item-label>{{record.categoryName}}</q-item-label>
+            <q-item-label>{{record.accountName}}</q-item-label>
             <q-item-label caption>{{record.accountType}}</q-item-label>
           </q-item-section>
 
@@ -20,17 +36,16 @@
             <q-item-label caption>{{record.recordDate}}</q-item-label>
           </q-item-section>
         </q-item>
-
-        <q-inner-loading
-          :showing="loading"
-          size="sm"
-          label="Please wait..."
-          label-class="text-primary"
-          label-style="font-size: 0.8em"
-        />
-
       </q-list>
     </div>
+
+    <q-inner-loading
+      :showing="loading"
+      size="sm"
+      label="Please wait..."
+      label-class="text-primary"
+      label-style="font-size: 0.8em"
+    />
   </q-page>
 </template>
 
@@ -46,9 +61,9 @@ interface RecordOverview {
   type: string,
   recordDate: Date,
   description: string,
-  categoryName: string,
   categoryIcon: string,
   categoryColor: string,
+  accountName: string,
   accountType: string,
   currencySymbol: string
 }
@@ -75,9 +90,9 @@ async function fetchData () {
 
     return {
       ...record,
-      categoryName: category?.name,
       categoryIcon: category?.icon,
       categoryColor: category?.color,
+      accountName: account?.name,
       accountType: account?.type,
       currencySymbol: account?.currencySymbol
     } as RecordOverview
