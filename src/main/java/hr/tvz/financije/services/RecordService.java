@@ -16,6 +16,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class RecordService {
 
+    private static final String RECORD_INCOME = "Income";
+
     private final RecordRepository repository;
     private final AccountService accountService;
 
@@ -27,18 +29,31 @@ public class RecordService {
     }
 
     public RecordDto saveRecord(RecordCommand command) {
+        accountService.updateAccountAmount(
+                command.accountId(),
+                BigDecimal.valueOf(command.amount())
+                        .setScale(3, RoundingMode.HALF_UP)
+                        .multiply(BigDecimal.valueOf(command.type().compareTo(RECORD_INCOME) == 0 ? 100 : -100))
+                        .longValueExact());
+
         return mapToRecordDto(repository.saveRecord(mapToRecordRecord(command)));
     }
 
     public void deleteRecordById(int id) {
+        RecordRecord recordRecord = repository.getRecordById(id).orElseThrow();
+        accountService.updateAccountAmount(
+                recordRecord.getAccountId(),
+                recordRecord.getType()
+                        .compareTo("Income") == 0 ? recordRecord.getAmount() : (recordRecord.getAmount() * -1)
+        );
         repository.deleteRecordById(id);
     }
 
     private RecordDto mapToRecordDto(RecordRecord record) {
         return new RecordDto(record.getId(),
                 BigDecimal.valueOf(record.getAmount())
+                        .setScale(3, RoundingMode.HALF_UP)
                         .divide(BigDecimal.valueOf(100), RoundingMode.HALF_UP)
-                        .setScale(2, RoundingMode.HALF_UP)
                         .doubleValue(),
                 record.getType(),
                 record.getRecordDate(),
@@ -51,7 +66,7 @@ public class RecordService {
     private RecordRecord mapToRecordRecord(RecordCommand command) {
         return new RecordRecord(command.id(),
                 BigDecimal.valueOf(command.amount())
-                        .setScale(2, RoundingMode.HALF_UP)
+                        .setScale(3, RoundingMode.HALF_UP)
                         .multiply(BigDecimal.valueOf(100))
                         .longValueExact(),
                 command.type(),

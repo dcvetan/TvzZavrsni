@@ -32,6 +32,11 @@ public class AccountService {
         return mapToAccountDto(repository.findAccountById(savedRecord.getId()).orElseThrow());
     }
 
+    public void updateAccountAmount(int accountId, long amount) {
+        AccountRecord accountRecord = repository.findAccountById(accountId).orElseThrow();
+        repository.updateAccountAmount(accountId, accountRecord.getAmount() + amount);
+    }
+
     public void deleteAccountById(int id) {
         repository.deleteAccountById(id);
     }
@@ -40,8 +45,8 @@ public class AccountService {
         return new AccountDto(record.getId(),
                 record.getName(),
                 BigDecimal.valueOf(record.getAmount())
+                        .setScale(3, RoundingMode.HALF_UP)
                         .divide(BigDecimal.valueOf(100), RoundingMode.HALF_UP)
-                        .setScale(2, RoundingMode.HALF_UP)
                         .doubleValue(),
                 record.getType(),
                 record.getColor(),
@@ -53,7 +58,7 @@ public class AccountService {
         return new AccountRecord(command.id(),
                 command.name(),
                 BigDecimal.valueOf(command.amount())
-                        .setScale(2, RoundingMode.HALF_UP)
+                        .setScale(3, RoundingMode.HALF_UP)
                         .multiply(BigDecimal.valueOf(100))
                         .longValueExact(),
                 command.type(),

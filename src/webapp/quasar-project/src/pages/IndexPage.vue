@@ -5,15 +5,15 @@
 
         <q-item-label header>List of accounts</q-item-label>
 
-        <div v-for="account in accountStore.accounts" :key="account.id" class="q-pb-md">
+        <div v-for="account in accountOverviews" :key="account.id" class="q-pb-md">
           <q-item
             clickable
             :class="'bg-' + account.color + ' q-pa-none rounded-borders'"
             @click="onEditAccount(account)"
           >
             <q-item-section class="q-pa-md">
-              <q-item-label>{{account.name}}</q-item-label>
-              <q-item-label caption>{{account.currencySymbol}} {{account.amount}}</q-item-label>
+              <q-item-label caption>{{account.name}}</q-item-label>
+              <q-item-label>{{account.currencySymbol}} {{account.amount}}</q-item-label>
             </q-item-section>
 
             <q-item-section side>
@@ -57,6 +57,7 @@
           <q-item-section>
             <q-item-label>{{record.accountName}}</q-item-label>
             <q-item-label caption>{{record.accountType}}</q-item-label>
+            <q-item-label v-if="record.description !== undefined" caption class="text-italic">{{record.description}}</q-item-label>
           </q-item-section>
 
           <q-item-section side top>
@@ -65,6 +66,77 @@
           </q-item-section>
         </q-item>
       </q-list>
+    </div>
+
+    <div class="q-pa-lg">
+      <q-card bordered padding class="q-pa-md no-shadow" style="min-width: 300px">
+
+        <q-item-label header>New record</q-item-label>
+
+        <q-form
+          @submit.prevent="onRecordAdd"
+        >
+          <q-input
+            v-model.trim="recordAmount"
+            label="Amount"
+            :rules="[
+              (value) => !isNaN(+value) || 'Record amount must be numeric',
+              (value) => value > 0 || 'Record amount must be greater than zero'
+            ]"
+            class="q-pb-md"
+          />
+          <q-select
+            v-model="recordAccount"
+            label="Account"
+            class="q-pb-md"
+            :options="accountOptions"
+            :rules="[
+              (value) => value !== undefined || 'Referenced account must be set'
+            ]"
+          />
+          <q-input
+            v-model.trim="recordDescription"
+            label="Description"
+            class="q-pb-md"
+          />
+          <q-btn-toggle
+            v-model="recordType"
+            spread
+            no-caps
+            :toggle-color="recordType === 'Income' ? 'positive' : 'negative'"
+            color="white"
+            text-color="black"
+            class="no-shadow"
+            :options="[
+              {label: 'Income', value: 'Income'},
+              {label: 'Expense', value: 'Expense'}
+            ]"
+            :rules="[
+              (value) => value !== undefined || 'Record type must be set'
+            ]"
+          />
+
+          <q-card-actions align="right" class="q-pt-lg">
+            <q-btn
+              flat
+              label="Add record"
+              color="primary"
+              type="submit"
+              :loading="recordFormLoading"
+            />
+            <q-btn
+              ref="recordForm"
+              flat
+              label="Reset"
+              color="black"
+              type="reset"
+              :loading="recordFormLoading"
+              @click="resetRecordFormValues"
+            />
+          </q-card-actions>
+        </q-form>
+
+      </q-card>
     </div>
 
     <q-inner-loading
@@ -191,7 +263,7 @@ interface RecordOverview {
   amount: number,
   type: string,
   recordDate: Date,
-  description: string,
+  description: string | undefined,
   categoryIcon: string,
   categoryColor: string,
   accountName: string,
@@ -199,7 +271,18 @@ interface RecordOverview {
   currencySymbol: string
 }
 
-interface CurrencyOption {
+interface AccountOverview {
+  id: number,
+  name: string,
+  amount: number,
+  type: string,
+  color: string,
+  source: string,
+  currencyId: number
+  currencySymbol: string
+}
+
+interface SelectOption {
   label: string,
   value: number
 }
@@ -210,20 +293,29 @@ const categoryStore = useCategoryStore()
 const currencyStore = useCurrencyStore()
 
 const recordOverviews = ref<RecordOverview[]>([])
+const accountOverviews = ref<AccountOverview[]>([])
 const loading = ref<boolean>(false)
+
 const accountFormDialogLoading = ref<boolean>(false)
 const accountFormDialogVisible = ref<boolean>(false)
 const accountDeleteDialogLoading = ref<boolean>(false)
 const accountDeleteDialogVisible = ref<boolean>(false)
 const selectedAccountId = ref<number>()
 
-const currencyOptions = ref<object[]>([])
-
+const currencyOptions = ref<SelectOption[]>([])
 const accountName = ref<string>('')
 const accountType = ref<string>('')
 const accountInitialValue = ref<number>(0)
-const accountCurrency = ref<CurrencyOption>()
+const accountCurrency = ref<SelectOption>()
 const accountColor = ref<string>('pink')
+
+const recordFormLoading = ref<boolean>(false)
+
+const accountOptions = ref<SelectOption[]>([])
+const recordAmount = ref<number>()
+const recordAccount = ref<SelectOption>()
+const recordDescription = ref<string>()
+const recordType = ref<string>('Income')
 
 onMounted(async () => {
   await fetchData()
@@ -250,11 +342,25 @@ async function fetchData () {
     } as RecordOverview
   })
 
+  accountOverviews.value = accountStore.accounts.map(account => ({
+    ...account,
+    currencySymbol: currencyStore.currencies.find(currency => currency.id === account?.currencyId)!.symbol
+  }))
+
   currencyOptions.value = currencyStore.currencies.map(
     currency => ({ label: currency.code, value: currency.id })
   )
 
+  refreshAccountOptions()
+
   loading.value = false
+}
+
+function refreshAccountOptions() {
+  accountOptions.value = accountStore.accounts.map(account => ({
+    label: account.name,
+    value: account.id
+  }))
 }
 
 async function onAccountFormSubmit() {
@@ -275,6 +381,7 @@ async function onAccountFormSubmit() {
   showNotif('Account saved successfully!')
 
   await accountStore.load()
+  refreshAccountOptions()
 
   accountFormDialogVisible.value = false
   accountFormDialogLoading.value = false
@@ -303,15 +410,22 @@ function onEditAccount(account: Account) {
 function onAccountDialogClose() {
   accountFormDialogVisible.value = false
   selectedAccountId.value = undefined
-  resetFormValues()
+  resetAccountFormValues()
 }
 
-function resetFormValues() {
+function resetAccountFormValues() {
   accountName.value = ''
   accountType.value = ''
   accountInitialValue.value = 0
   accountCurrency.value = undefined
   accountColor.value = 'primary'
+}
+
+function resetRecordFormValues() {
+  recordType.value = 'Income'
+  recordDescription.value = undefined
+  recordAmount.value = undefined
+  recordAccount.value = undefined
 }
 
 function onDeleteAccount (id: number) {
@@ -329,10 +443,34 @@ async function onConfirmDeleteAccount () {
   showNotif('Account deleted successfully!')
 
   await accountStore.load()
+  refreshAccountOptions()
 
   accountDeleteDialogVisible.value = false
   selectedAccountId.value = undefined
   accountDeleteDialogLoading.value = false
+}
+
+async function onRecordAdd() {
+  recordFormLoading.value = true
+
+  await recordService.saveRecord({
+    id: undefined,
+    amount: recordAmount.value!,
+    accountId: recordAccount.value!.value,
+    categoryId: 1,
+    recordDate: new Date(),
+    description: recordDescription.value,
+    type: recordType.value,
+    receivingAccountId: undefined
+  })
+
+  showNotif('Record added successfully!')
+
+  await accountStore.load()
+  await fetchData()
+
+  recordFormLoading.value = false
+  resetRecordFormValues()
 }
 
 function showNotif (message: string) {

@@ -1,5 +1,5 @@
-export interface Record {
-  id: number,
+export interface RecordRequest {
+  id: number | undefined,
   amount: number,
   type: string,
   recordDate: Date,

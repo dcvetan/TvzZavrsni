@@ -37,6 +37,13 @@ public class AccountRepository {
                 .fetchOne();
     }
 
+    public void updateAccountAmount(int id, long amount) {
+        dslContext.update(ACCOUNT)
+                .set(ACCOUNT.AMOUNT, amount)
+                .where(ACCOUNT.ID.eq(id))
+                .execute();
+    }
+
     public void deleteAccountById(int id) {
         dslContext.deleteFrom(ACCOUNT)
                 .where(ACCOUNT.ID.eq(id))
