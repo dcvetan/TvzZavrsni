@@ -29,7 +29,7 @@ public class AccountService {
     public AccountDto saveAccount(AccountCommand command) {
         int currentProfileId = userDetailsService.getCurrentUserProfileId();
         AccountRecord savedRecord = repository.saveAccount(mapToAccountRecord(command, currentProfileId));
-        return mapToAccountDto(repository.findAccountById(savedRecord.getId()).orElseThrow());
+        return mapToAccountDto(savedRecord);
     }
 
     public void updateAccountAmount(int accountId, long amount) {
