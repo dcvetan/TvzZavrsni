@@ -29,12 +29,28 @@ public class RecordService {
     }
 
     public RecordDto saveRecord(RecordCommand command) {
-        accountService.updateAccountAmount(
-                command.accountId(),
-                BigDecimal.valueOf(command.amount())
-                        .setScale(3, RoundingMode.HALF_UP)
-                        .multiply(BigDecimal.valueOf(command.type().compareTo(RECORD_INCOME) == 0 ? 100 : -100))
-                        .longValueExact());
+        if (command.id() == null) {
+            accountService.updateAccountAmount(
+                    command.accountId(),
+                    BigDecimal.valueOf(command.amount())
+                            .setScale(3, RoundingMode.HALF_UP)
+                            .multiply(BigDecimal.valueOf(command.type().compareTo(RECORD_INCOME) == 0 ? 100 : -100))
+                            .longValueExact());
+        } else {
+            RecordRecord recordRecord = repository.getRecordById(command.id()).orElseThrow();
+
+            BigDecimal previousAmount = BigDecimal.valueOf(recordRecord.getAmount())
+                    .setScale(3, RoundingMode.HALF_UP)
+                    .divide(BigDecimal.valueOf(100), RoundingMode.HALF_UP);
+
+            accountService.updateAccountAmount(
+                    command.accountId(),
+                    BigDecimal.valueOf(command.amount())
+                            .setScale(3, RoundingMode.HALF_UP)
+                            .subtract(previousAmount)
+                            .multiply(BigDecimal.valueOf(command.type().compareTo(RECORD_INCOME) == 0 ? 100 : -100))
+                            .longValueExact());
+        }
 
         return mapToRecordDto(repository.saveRecord(mapToRecordRecord(command)));
     }

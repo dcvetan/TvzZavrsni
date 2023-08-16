@@ -37,8 +37,10 @@ public class SecurityConfiguration {
         httpSecurity
                 .cors(httpSecurityCorsConfigurer -> httpSecurityCorsConfigurer.configure(httpSecurity))
                 .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(request -> request.requestMatchers("/api/authenticate/**")
-                        .permitAll().anyRequest().authenticated())
+                .authorizeHttpRequests(request ->
+                        request.requestMatchers("/api/authenticate/**").permitAll()
+                                .requestMatchers("/api/webhook").permitAll()
+                                .anyRequest().authenticated())
                 .sessionManagement(manager -> manager.sessionCreationPolicy(STATELESS))
                 .exceptionHandling(handlingConfigurer -> handlingConfigurer
                         .authenticationEntryPoint(jwtAuthenticationEntryPoint));

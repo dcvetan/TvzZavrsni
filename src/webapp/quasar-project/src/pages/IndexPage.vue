@@ -1,5 +1,39 @@
 <template>
+  <div class="row items-center justify-evenly">
+    <span class="text-h4 q-mt-xl">
+      Hello, Dominik
+    </span>
+  </div>
   <q-page class="row items-center justify-evenly">
+    <ChartComponent
+      v-if="recordAmountPerCategory"
+      style="min-width: 500px"
+      :chart-options="
+      {
+        chart: {
+          id: 'donut-chart',
+        },
+        plotOptions: {
+          pie: {
+            donut: {
+              labels: {
+                show: true,
+                name: {
+                  show: true,
+
+                },
+                total: {
+                  show: true,
+                  label: 'Total expenses'
+                }
+              }
+            }
+          }
+        },
+        labels: Array.from(recordAmountPerCategory.keys()),
+      }"
+      :chart-series="Array.from(recordAmountPerCategory.values())"
+    />
     <div class="q-pa-lg">
       <q-list bordered padding class="q-pa-md" style="min-width: 300px">
 
@@ -47,9 +81,26 @@
     <div class="q-pa-lg">
       <q-list bordered padding class="q-pa-md" style="min-width: 300px">
 
-        <q-item-label header>Last records overview</q-item-label>
+        <q-item>
+          <q-item-section>
+            <q-item-label header>Last records overview</q-item-label>
+          </q-item-section>
 
-        <q-item clickable v-for="record in recordOverviews" :key="record.id">
+          <q-item-section side top>
+            <q-btn
+              color="primary"
+              label="Add New"
+              @click="recordFormDialogVisible = true"
+            />
+          </q-item-section>
+        </q-item>
+
+        <q-item
+          clickable
+          v-for="record in recordOverviews"
+          :key="record.id"
+          @click="onEditRecord(record.id)"
+        >
           <q-item-section avatar>
             <q-icon :name="record.categoryIcon" :color="record.categoryColor" />
           </q-item-section>
@@ -66,77 +117,6 @@
           </q-item-section>
         </q-item>
       </q-list>
-    </div>
-
-    <div class="q-pa-lg">
-      <q-card bordered padding class="q-pa-md no-shadow" style="min-width: 300px">
-
-        <q-item-label header>New record</q-item-label>
-
-        <q-form
-          @submit.prevent="onRecordAdd"
-        >
-          <q-input
-            v-model.trim="recordAmount"
-            label="Amount"
-            :rules="[
-              (value) => !isNaN(+value) || 'Record amount must be numeric',
-              (value) => value > 0 || 'Record amount must be greater than zero'
-            ]"
-            class="q-pb-md"
-          />
-          <q-select
-            v-model="recordAccount"
-            label="Account"
-            class="q-pb-md"
-            :options="accountOptions"
-            :rules="[
-              (value) => value !== undefined || 'Referenced account must be set'
-            ]"
-          />
-          <q-input
-            v-model.trim="recordDescription"
-            label="Description"
-            class="q-pb-md"
-          />
-          <q-btn-toggle
-            v-model="recordType"
-            spread
-            no-caps
-            :toggle-color="recordType === 'Income' ? 'positive' : 'negative'"
-            color="white"
-            text-color="black"
-            class="no-shadow"
-            :options="[
-              {label: 'Income', value: 'Income'},
-              {label: 'Expense', value: 'Expense'}
-            ]"
-            :rules="[
-              (value) => value !== undefined || 'Record type must be set'
-            ]"
-          />
-
-          <q-card-actions align="right" class="q-pt-lg">
-            <q-btn
-              flat
-              label="Add record"
-              color="primary"
-              type="submit"
-              :loading="recordFormLoading"
-            />
-            <q-btn
-              ref="recordForm"
-              flat
-              label="Reset"
-              color="black"
-              type="reset"
-              :loading="recordFormLoading"
-              @click="resetRecordFormValues"
-            />
-          </q-card-actions>
-        </q-form>
-
-      </q-card>
     </div>
 
     <q-inner-loading
@@ -231,6 +211,109 @@
         </q-form>
       </q-card>
     </q-dialog>
+
+    <q-dialog
+      v-model="recordFormDialogVisible"
+    >
+      <q-card style="width: 700px; max-width: 80vw;">
+        <q-card-section>
+          <div class="text-h6">{{ selectedRecordId === undefined ? 'New record' : 'Edit record' }}</div>
+          <q-form
+            class="q-pt-none q-px-lg"
+            @submit.prevent="onRecordFormSubmit"
+          >
+            <q-input
+              v-model.trim="recordAmount"
+              label="Amount"
+              :rules="[
+              (value) => !isNaN(+value) || 'Record amount must be numeric',
+              (value) => value > 0 || 'Record amount must be greater than zero'
+            ]"
+              class="q-pb-md"
+            />
+            <q-select
+              v-model="recordAccount"
+              label="Account"
+              class="q-pb-md"
+              :options="accountOptions"
+              :rules="[
+              (value) => value !== undefined || 'Referenced account must be set'
+            ]"
+            />
+            <q-input
+              v-model.trim="recordDescription"
+              label="Description"
+              class="q-pb-md"
+            />
+            <q-select
+              v-model="recordCategory"
+              clearable
+              label="Category"
+              class="q-pb-md"
+              :options="categoryStore.categories"
+              :rules="[
+              (value) => value !== undefined || 'Category must be set',
+            ]"
+            >
+              <template #option="{ itemProps, opt }">
+                <q-item v-bind="itemProps">
+                  <q-item-section avatar>
+                    <q-icon :color="opt.color" :name="opt.icon" />
+                  </q-item-section>
+
+                  <q-item-section>{{opt.name}}</q-item-section>
+                </q-item>
+              </template>
+              <template #selected-item="{ opt }">
+                <q-item>
+                  <q-item-section avatar>
+                    <q-icon :color="opt.color" :name="opt.icon" />
+                  </q-item-section>
+
+                  <q-item-section>{{opt.name}}</q-item-section>
+                </q-item>
+              </template>
+            </q-select>
+            <q-btn-toggle
+              v-model="recordType"
+              spread
+              no-caps
+              :toggle-color="recordType === 'Income' ? 'positive' : 'negative'"
+              color="white"
+              text-color="black"
+              class="no-shadow"
+              :options="[
+              {label: 'Income', value: 'Income'},
+              {label: 'Expense', value: 'Expense'}
+            ]"
+              :rules="[
+              (value) => value !== undefined || 'Record type must be set'
+            ]"
+            />
+
+            <q-card-actions align="right" class="q-pt-lg">
+              <q-btn
+                flat
+                label="Add record"
+                color="primary"
+                type="submit"
+                :loading="recordFormLoading"
+              />
+              <q-btn
+                ref="recordForm"
+                flat
+                label="Cancel"
+                color="black"
+                type="reset"
+                :loading="recordFormLoading"
+                @click="onRecordDialogClose"
+              />
+            </q-card-actions>
+          </q-form>
+        </q-card-section>
+      </q-card>
+    </q-dialog>
+
     <q-dialog
       v-model="accountDeleteDialogVisible"
     >
@@ -257,6 +340,9 @@ import { useCurrencyStore } from 'stores/currencyStore';
 import { accountService } from 'src/services/accountService';
 import { useQuasar } from 'quasar';
 import { Account } from 'src/models/account';
+import { Category } from 'src/models/category';
+import { Record } from 'src/models/record';
+import ChartComponent from 'components/ChartComponent.vue';
 
 interface RecordOverview {
   id: number,
@@ -294,6 +380,7 @@ const currencyStore = useCurrencyStore()
 
 const recordOverviews = ref<RecordOverview[]>([])
 const accountOverviews = ref<AccountOverview[]>([])
+const records = ref<Record[]>([])
 const loading = ref<boolean>(false)
 
 const accountFormDialogLoading = ref<boolean>(false)
@@ -307,15 +394,20 @@ const accountName = ref<string>('')
 const accountType = ref<string>('')
 const accountInitialValue = ref<number>(0)
 const accountCurrency = ref<SelectOption>()
-const accountColor = ref<string>('pink')
+const accountColor = ref<string>('primary')
 
 const recordFormLoading = ref<boolean>(false)
+const recordFormDialogVisible = ref<boolean>(false)
+const selectedRecordId = ref<number>()
 
 const accountOptions = ref<SelectOption[]>([])
 const recordAmount = ref<number>()
 const recordAccount = ref<SelectOption>()
 const recordDescription = ref<string>()
+const recordCategory = ref<Category>()
 const recordType = ref<string>('Income')
+
+const recordAmountPerCategory = ref<Map<string, number>>()
 
 onMounted(async () => {
   await fetchData()
@@ -324,9 +416,9 @@ onMounted(async () => {
 async function fetchData () {
   loading.value = true
 
-  const records = (await recordService.getRecords())
+  records.value = (await recordService.getRecords())
 
-  recordOverviews.value = records.map(record => {
+  recordOverviews.value = records.value.map(record => {
 
     const account = accountStore.accounts.find(account => account.id === record.accountId)
     const category = categoryStore.categories.find(category => category.id === record.categoryId)
@@ -340,7 +432,8 @@ async function fetchData () {
       accountType: account?.type,
       currencySymbol: currency?.symbol
     } as RecordOverview
-  })
+  }).sort((a, b) => new Date(b.recordDate).getTime() - new Date(a.recordDate).getTime())
+    .splice(0, 5)
 
   accountOverviews.value = accountStore.accounts.map(account => ({
     ...account,
@@ -351,13 +444,27 @@ async function fetchData () {
     currency => ({ label: currency.code, value: currency.id })
   )
 
+  recordAmountPerCategory.value = new Map<string, number>()
+
+  records.value.forEach(record => {
+    if (record.type === 'Expense') {
+      const category = categoryStore.categories.find(category => category.id === record.categoryId)!
+
+      if (recordAmountPerCategory.value?.has(category.name)) {
+        recordAmountPerCategory.value?.set(category.name, recordAmountPerCategory.value.get(category.name)! + record.amount)
+      } else {
+        recordAmountPerCategory.value?.set(category.name, record.amount)
+      }
+    }
+  })
+
   refreshAccountOptions()
 
   loading.value = false
 }
 
 function refreshAccountOptions() {
-  accountOptions.value = accountStore.accounts.map(account => ({
+  accountOptions.value = accountStore.accounts.filter(account => account.source === 'Manual').map(account => ({
     label: account.name,
     value: account.id
   }))
@@ -381,9 +488,10 @@ async function onAccountFormSubmit() {
   showNotif('Account saved successfully!')
 
   await accountStore.load()
-  refreshAccountOptions()
+  await fetchData()
 
   accountFormDialogVisible.value = false
+  resetAccountFormValues()
   accountFormDialogLoading.value = false
   selectedAccountId.value = undefined
 }
@@ -421,13 +529,6 @@ function resetAccountFormValues() {
   accountColor.value = 'primary'
 }
 
-function resetRecordFormValues() {
-  recordType.value = 'Income'
-  recordDescription.value = undefined
-  recordAmount.value = undefined
-  recordAccount.value = undefined
-}
-
 function onDeleteAccount (id: number) {
   selectedAccountId.value = id
   accountDeleteDialogVisible.value = true
@@ -450,14 +551,14 @@ async function onConfirmDeleteAccount () {
   accountDeleteDialogLoading.value = false
 }
 
-async function onRecordAdd() {
+async function onRecordFormSubmit() {
   recordFormLoading.value = true
 
   await recordService.saveRecord({
-    id: undefined,
+    id: selectedRecordId.value,
     amount: recordAmount.value!,
     accountId: recordAccount.value!.value,
-    categoryId: 1,
+    categoryId: recordCategory.value!.id,
     recordDate: new Date(),
     description: recordDescription.value,
     type: recordType.value,
@@ -469,8 +570,43 @@ async function onRecordAdd() {
   await accountStore.load()
   await fetchData()
 
+  recordFormDialogVisible.value = false
   recordFormLoading.value = false
   resetRecordFormValues()
+}
+
+function onEditRecord(recordId: number) {
+  const record = records.value.find(record => record.id === recordId)!
+
+  selectedRecordId.value = record.id
+
+  const accountName = accountStore.accounts.find(account => account.id === record.accountId)?.name
+  const category = categoryStore.categories.find(category => category.id === record.categoryId)
+
+  recordAmount.value = record.amount
+  recordAccount.value = {
+    label: accountName!,
+    value: record.accountId
+  }
+  recordDescription.value = record.description
+  recordCategory.value = category
+  recordType.value = record.type
+
+  recordFormDialogVisible.value = true
+}
+
+function onRecordDialogClose() {
+  recordFormDialogVisible.value = false
+  selectedRecordId.value = undefined
+  resetRecordFormValues()
+}
+
+function resetRecordFormValues() {
+  recordType.value = 'Income'
+  recordDescription.value = undefined
+  recordAmount.value = undefined
+  recordAccount.value = undefined
+  recordCategory.value = undefined
 }
 
 function showNotif (message: string) {

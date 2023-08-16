@@ -16,7 +16,7 @@
                 <q-card-section>
                   <div class="row q-gutter-md align-center q-py-xs">
                     <div class="text-bold">
-                      Login
+                      Register
                     </div>
                   </div>
                 </q-card-section>
@@ -39,10 +39,20 @@
                       label="Password"
                       :rules="[ (value) => value.trim().length !== 0 || 'Password must not be empty' ]"
                     />
+                    <q-input
+                      v-model.trim="passwordConfirm"
+                      square
+                      type="password"
+                      label="Confirm password"
+                      :rules="[
+                        (value) => value.trim().length !== 0 || 'Password must not be empty',
+                        (value) => value.trim() === password || 'Passwords must match'
+                      ]"
+                    />
 
-                    <div v-if="loginFailed">
+                    <div v-if="registerFailed">
                       <p class="text-negative text-body1">
-                        Incorrect username or password
+                        Username taken
                       </p>
                     </div>
                   </q-card-section>
@@ -55,7 +65,7 @@
                       :loading="loading"
                       size="lg"
                       class="full-width text-white"
-                      label="Login"
+                      label="Register"
                     />
                     <q-btn
                       flat
@@ -64,8 +74,8 @@
                       :loading="loading"
                       size="lg"
                       class="full-width text-primary q-pt-lg"
-                      label="Register"
-                      :to="{name: 'register'}"
+                      label="Login"
+                      :to="{name: 'login'}"
                     />
                   </q-card-actions>
                 </q-form>
@@ -86,16 +96,17 @@ const authStore = useAuthStore()
 
 const username = ref('')
 const password = ref('')
+const passwordConfirm = ref('')
 const loading = ref(false)
-const loginFailed = ref(false)
+const registerFailed = ref(false)
 
 async function submit (): Promise<void> {
   loading.value = true
 
   try {
-    await authStore.signIn(username.value.trim(), password.value.trim())
+    await authStore.signUp(username.value.trim(), password.value.trim())
   } catch (_) {
-    loginFailed.value = true
+    registerFailed.value = true
   }
 
 

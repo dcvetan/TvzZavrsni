@@ -30,7 +30,7 @@
 
         <q-item
           clickable
-          :to="{name:'login'}"
+          :to="{name:'dashboard'}"
         >
           <q-item-section
             avatar
@@ -40,6 +40,21 @@
 
           <q-item-section>
             <q-item-label>Dashboard</q-item-label>
+          </q-item-section>
+        </q-item>
+
+        <q-item
+          clickable
+          :to="{name:'transactions'}"
+        >
+          <q-item-section
+            avatar
+          >
+            <q-icon name="swap_horiz" />
+          </q-item-section>
+
+          <q-item-section>
+            <q-item-label>Transactions</q-item-label>
           </q-item-section>
         </q-item>
 
