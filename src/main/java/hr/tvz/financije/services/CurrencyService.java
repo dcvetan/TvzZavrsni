@@ -31,8 +31,8 @@ public class CurrencyService {
                 record.getCode(),
                 record.getSymbol(),
                 BigDecimal.valueOf(record.getExchangeRate())
+                        .setScale(2, RoundingMode.HALF_UP)
                         .divide(BigDecimal.valueOf(1000000), RoundingMode.HALF_UP)
-                        .setScale(3, RoundingMode.HALF_UP)
                         .doubleValue(),
                 record.getLastUpdateDate());
     }

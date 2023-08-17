@@ -20,11 +20,19 @@
                 show: true,
                 name: {
                   show: true,
-
+                },
+                value: {
+                  show: true,
+                  formatter: function (value) {
+                    return parseFloat(value).toFixed(2);
+                  }
                 },
                 total: {
                   show: true,
-                  label: 'Total expenses'
+                  label: 'Total expenses',
+                  formatter: function (value) {
+                    return Array.from(recordAmountPerCategory.values()).reduce((previousValue, currentValue) => previousValue + currentValue).toFixed(2)
+                  }
                 }
               }
             }
@@ -112,8 +120,8 @@
           </q-item-section>
 
           <q-item-section side top>
-            <q-item-label>{{record.currencySymbol}} {{record.amount}}</q-item-label>
-            <q-item-label caption>{{record.recordDate}}</q-item-label>
+            <q-item-label :class="'text-' + (record.type === 'Income' ? 'positive' : 'negative')">{{record.currencySymbol}} {{record.type === 'Income' ? '' : '-'}}{{record.amount}}</q-item-label>
+            <q-item-label caption>{{new Date(record.recordDate).toLocaleString()}}</q-item-label>
           </q-item-section>
         </q-item>
       </q-list>
@@ -449,11 +457,14 @@ async function fetchData () {
   records.value.forEach(record => {
     if (record.type === 'Expense') {
       const category = categoryStore.categories.find(category => category.id === record.categoryId)!
+      const account = accountStore.accounts.find(account => account.id === record.accountId)
+      const currency = currencyStore.currencies.find(currency => currency.id === account?.currencyId)
+      const amount = record.amount / currency!.exchangeRate
 
       if (recordAmountPerCategory.value?.has(category.name)) {
-        recordAmountPerCategory.value?.set(category.name, recordAmountPerCategory.value.get(category.name)! + record.amount)
+        recordAmountPerCategory.value?.set(category.name, recordAmountPerCategory.value.get(category.name)! + amount)
       } else {
-        recordAmountPerCategory.value?.set(category.name, record.amount)
+        recordAmountPerCategory.value?.set(category.name, amount)
       }
     }
   })
